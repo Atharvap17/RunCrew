@@ -1,0 +1,27 @@
+# Python virtual environment
+backend/env/
+backend/venv/
+
+# Python cache
+**/__pycache__/
+*.py[cod]
+
+# Environment variables
+backend/.env
+
+# SQLite database
+backend/db.sqlite3
+
+# Exported data
+backend/data.json
+backend/app_data.json
+
+# VS Code
+.vscode/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Logs
+*.log
