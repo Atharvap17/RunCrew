@@ -64,10 +64,12 @@ Open **http://localhost:5173**
 
 ## Demo Accounts
 
-| Role | Email | Password |
-|------|-------|----------|
-| Admin | admin@runcrew.com | admin123 |
-| Runner | runner@runcrew.com | runner123 |
+## Admin Access
+
+The RunCrew Admin Panel is restricted to the authorized administrator only.
+
+- Admin access is protected by authentication and role-based authorization.
+- Regular users and runners cannot access the Admin Panel.
 
 ## API Endpoints
 
