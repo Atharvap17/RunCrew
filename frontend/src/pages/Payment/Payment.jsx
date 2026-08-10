@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { HiShieldCheck, HiCreditCard, HiLockClosed } from "react-icons/hi";
+import { HiShieldCheck, HiCreditCard, HiLockClosed, HiCalendar, HiTicket } from "react-icons/hi";
 import { getRegistration } from "../../services/registrationService";
 import { createOrder, verifyPayment } from "../../services/paymentService";
-import Button from "../../components/Common/Button";
 
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -102,79 +101,89 @@ export default function Payment() {
 
   if (!registration) {
     return (
-      <div className="loading-center">
+      <div className="loading-center min-h-[60vh] flex flex-col items-center justify-center gap-4">
         <div className="loading-spinner" />
+        <p className="text-gray-400 text-sm">Preparing checkout session...</p>
       </div>
     );
   }
 
   return (
-    <div className="participant-page">
-      <div className="participant-flow">
+    <div className="participant-page py-12 px-4 sm:px-6">
+      <div className="max-w-2xl mx-auto space-y-8">
         
-        <div className="participant-flow__header">
-          <span className="flow-kicker">
-            Razorpay Secure Gateway
+        {/* Header */}
+        <div className="text-center space-y-3">
+          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#f15a24]/10 border border-[#f15a24]/30 text-[#f15a24] text-xs font-bold uppercase tracking-wider">
+            <HiShieldCheck className="text-base" /> Razorpay 256-Bit Secure Checkout
           </span>
-          <h1>Race entry payment</h1>
-          <p>
-            Complete your registration using Razorpay (Cards, UPI, NetBanking, Wallets).
+          <h1 className="font-display text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            Race Entry Checkout
+          </h1>
+          <p className="text-gray-400 text-sm max-w-md mx-auto">
+            Complete your registration using Cards, UPI, NetBanking, or Wallets.
           </p>
         </div>
 
-        <div className="flow-panel flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="space-y-1.5 text-center sm:text-left">
-            <span className="text-brand text-xs font-bold uppercase tracking-widest bg-brand/15 px-3 py-1 rounded-md">
-              Bib Assigned: {registration.bib_number || "BIB-PENDING"}
-            </span>
-            <h3 className="font-display text-2xl text-white mt-2">{registration.event_title}</h3>
-            <p className="text-xs text-gray-400">Date: {registration.event_date}</p>
+        {/* Event Summary Box */}
+        <div className="bg-[#12141d] border border-white/10 rounded-2xl p-6 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="space-y-2 text-center sm:text-left">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#f15a24]/15 border border-[#f15a24]/30 text-[#f15a24] text-xs font-bold font-mono">
+              <HiTicket /> BIB: {registration.bib_number || "BIB-ASSIGNED"}
+            </div>
+            <h3 className="font-display text-xl font-bold text-white mt-1">
+              {registration.event_title}
+            </h3>
+            <p className="text-xs text-gray-400 flex items-center justify-center sm:justify-start gap-1.5">
+              <HiCalendar className="text-gray-500" /> Event Date: {registration.event_date}
+            </p>
           </div>
+
           <div className="text-center sm:text-right border-t sm:border-t-0 sm:border-l border-white/10 pt-4 sm:pt-0 sm:pl-8 shrink-0">
-            <p className="text-xs uppercase tracking-wider text-gray-400 font-semibold">Total Amount</p>
-            <p className="font-display text-4xl text-brand font-bold mt-1">₹{registration.event_fees}</p>
+            <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Total Entry Fee</p>
+            <p className="font-display text-3xl text-[#f15a24] font-extrabold mt-0.5">
+              ₹{registration.event_fees}
+            </p>
           </div>
         </div>
 
-        <div className="flow-panel flex flex-col gap-8 text-center">
+        {/* Payment Action Panel */}
+        <div className="bg-[#12141d] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-xl text-center space-y-6">
           <div className="flex flex-col items-center gap-3">
-            <div className="w-16 h-16 rounded-2xl bg-brand/15 border border-brand/30 flex items-center justify-center text-brand text-3xl">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#f15a24]/20 to-[#f15a24]/5 border border-[#f15a24]/30 text-[#f15a24] flex items-center justify-center text-3xl shadow-lg shadow-[#f15a24]/10">
               <HiCreditCard />
             </div>
-            <h2 className="font-display text-2xl text-white">Razorpay Secure Checkout</h2>
-            <p className="text-xs text-gray-400 max-w-md">
-              Click below to launch Razorpay modal. You can pay via UPI, Credit/Debit Cards, NetBanking, or Wallets with end-to-end encryption.
+            <h2 className="font-display text-xl font-bold text-white">Instant Payment Authorization</h2>
+            <p className="text-xs text-gray-400 max-w-md leading-relaxed">
+              Clicking below will launch the official Razorpay gateway. Upon successful payment, your entry pass and bib confirmation will be issued immediately.
             </p>
           </div>
 
           {error && (
-            <div className="rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-sm px-5 py-4 flex items-center gap-3 text-left">
+            <div className="rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-sm p-4 flex items-center gap-3 text-left">
               <span className="w-2.5 h-2.5 rounded-full bg-rose-400 shrink-0" />
               {error}
             </div>
           )}
 
-          <div className="pt-2 flex flex-col gap-4">
-            <Button
+          <div className="pt-2 flex flex-col gap-3">
+            <button
               type="button"
               onClick={handleRazorpayPayment}
-              variant="primary"
-              size="lg"
-              className="w-full h-14 justify-center font-display font-semibold tracking-wider text-base uppercase shadow-xl shadow-brand/25"
               disabled={loading}
-              showArrow={false}
+              className="w-full h-14 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#f15a24] to-[#d04313] text-white font-bold text-base uppercase tracking-wider shadow-lg shadow-[#f15a24]/25 hover:shadow-xl hover:shadow-[#f15a24]/35 transition-all duration-200 cursor-pointer disabled:opacity-50"
             >
-              <HiLockClosed className="text-lg mr-2" />
-              {loading ? "Initializing Razorpay..." : `Pay ₹${registration.event_fees} via Razorpay`}
-            </Button>
+              <HiLockClosed className="text-xl" />
+              {loading ? "Launching Gateway..." : `Pay ₹${registration.event_fees} Now`}
+            </button>
 
-            <p className="text-xs text-gray-400 flex items-center justify-center gap-2 mt-2">
-              <HiShieldCheck className="text-brand text-base" /> Secured by Razorpay 256-Bit Encryption
+            <p className="text-xs text-gray-400 flex items-center justify-center gap-1.5">
+              <HiShieldCheck className="text-emerald-400 text-sm" /> 100% Encrypted & Safe Payment Gateway
             </p>
           </div>
         </div>
+
       </div>
     </div>
   );
 }
-

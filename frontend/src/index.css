@@ -633,6 +633,27 @@ button {
 .participant-detail-sidebar {
   position: sticky;
   top: 6.5rem;
+  background: var(--color-surface-2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-xl);
+  padding: 1.75rem !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.event-details-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.85rem;
+  margin-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.9rem;
+}
+
+.event-details-row:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0.25rem;
 }
 
 /* Swiper overrides */
@@ -1182,3 +1203,272 @@ button {
   opacity: 1;
   transform: scale(1);
 }
+
+/* ==========================================================================
+   PAYMENT CONFIRMATION E-TICKET CARD (PIXEL PERFECT)
+   ========================================================================== */
+
+.confirmation-card {
+  max-width: 620px;
+  width: 100%;
+  margin: 0 auto;
+  background: #111420;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 40px 32px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.confirmation-icon-circle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.2);
+  flex-shrink: 0;
+}
+
+.confirmation-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: 30px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: #10b981;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 16px;
+}
+
+.confirmation-title {
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 800;
+  font-family: var(--font-display, "Poppins", sans-serif);
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.confirmation-subtitle {
+  color: #9ca3af;
+  font-size: 14px;
+  max-width: 440px;
+  line-height: 1.5;
+  margin-bottom: 32px;
+}
+
+/* Race Pass Ticket Voucher */
+.confirmation-ticket {
+  width: 100%;
+  background: #171b2b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  overflow: hidden;
+  box-sizing: border-box;
+  text-align: left;
+  margin-bottom: 32px;
+}
+
+.confirmation-ticket-header {
+  padding: 20px 24px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.confirmation-ticket-label {
+  color: #9ca3af;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.confirmation-ticket-event {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.confirmation-bib-tag {
+  background: rgba(241, 90, 36, 0.15);
+  border: 1px solid rgba(241, 90, 36, 0.3);
+  padding: 8px 16px;
+  border-radius: 12px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.confirmation-bib-title {
+  color: #9ca3af;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.confirmation-bib-code {
+  color: #f15a24;
+  font-size: 18px;
+  font-weight: 900;
+  font-family: monospace;
+}
+
+/* Ticket Details Body */
+.confirmation-ticket-body {
+  padding: 20px 24px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.confirmation-detail-box {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+
+.confirmation-detail-box.full-width {
+  grid-column: span 2;
+}
+
+.confirmation-detail-key {
+  color: #6b7280;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 4px;
+}
+
+.confirmation-detail-val {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.confirmation-detail-val.mono {
+  font-family: monospace;
+  word-break: break-all;
+  font-size: 12px;
+  color: #d1d5db;
+}
+
+.confirmation-ticket-footer {
+  padding: 12px 24px;
+  background: rgba(16, 185, 129, 0.1);
+  border-top: 1px solid rgba(16, 185, 129, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #10b981;
+  font-weight: 700;
+}
+
+/* Buttons */
+.confirmation-actions {
+  width: 100%;
+  display: flex;
+  gap: 16px;
+}
+
+.btn-primary-custom {
+  flex: 1;
+  padding: 14px 20px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f15a24 0%, #d04313 100%);
+  color: #ffffff !important;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: none;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 15px rgba(241, 90, 36, 0.3);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-primary-custom:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(241, 90, 36, 0.4);
+}
+
+.btn-secondary-custom {
+  flex: 1;
+  padding: 14px 20px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff !important;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-secondary-custom:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.confirmation-footer-note {
+  margin-top: 20px;
+  font-size: 12px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (max-width: 640px) {
+  .confirmation-card {
+    padding: 24px 16px;
+  }
+  .confirmation-ticket-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .confirmation-ticket-body {
+    grid-template-columns: 1fr;
+  }
+  .confirmation-detail-box.full-width {
+    grid-column: span 1;
+  }
+  .confirmation-actions {
+    flex-direction: column;
+  }
+}
+

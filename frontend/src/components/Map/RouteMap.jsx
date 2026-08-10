@@ -12,32 +12,7 @@ const defaultIcon = L.icon({
   iconAnchor: [12, 41],
 });
 
-// Known city coordinate mapping for fallback matching
-const CITY_COORDINATES = {
-  mumbai: { lat: 18.9438, lng: 72.8232 }, // Marine Drive
-  delhi: { lat: 28.6129, lng: 77.2295 }, // India Gate
-  bengaluru: { lat: 12.9766, lng: 77.5993 }, // Cubbon Park
-  bangalore: { lat: 12.9766, lng: 77.5993 },
-  pune: { lat: 18.5204, lng: 73.8567 },
-  hyderabad: { lat: 17.4065, lng: 78.4772 }, // Hussain Sagar
-  chennai: { lat: 13.0475, lng: 80.2824 }, // Marina Beach
-  goa: { lat: 15.4989, lng: 73.8278 },
-  kolkata: { lat: 22.5448, lng: 88.3426 }, // Victoria Memorial
-  jaipur: { lat: 26.9124, lng: 75.7873 },
-};
 
-// Generates a realistic multi-point race loop path around a given center
-function generateRaceLoop(centerLat, centerLng) {
-  return [
-    [centerLat, centerLng],
-    [centerLat + 0.008, centerLng + 0.005],
-    [centerLat + 0.015, centerLng + 0.012],
-    [centerLat + 0.012, centerLng + 0.022],
-    [centerLat + 0.002, centerLng + 0.018],
-    [centerLat - 0.006, centerLng + 0.009],
-    [centerLat, centerLng], // Loop back to start line
-  ];
-}
 
 // Auto-adjusts map zoom & center to frame the entire polyline route
 function AutoFitBounds({ route }) {
@@ -51,7 +26,7 @@ function AutoFitBounds({ route }) {
         console.error("Map fitBounds error:", err);
       }
     } else if (route && route.length === 1) {
-      map.setView(route[0], 13);
+      map.setView(route[0], 14);
     }
   }, [map, route]);
   return null;
@@ -74,30 +49,44 @@ export default function RouteMap({
     });
   }, []);
 
-  // Determine center coordinates
-  let centerLat = startLat;
-  let centerLng = startLng;
+  const hasValidStart =
+    startLat !== null &&
+    startLat !== undefined &&
+    startLng !== null &&
+    startLng !== undefined &&
+    !isNaN(Number(startLat)) &&
+    !isNaN(Number(startLng));
 
-  if (!centerLat || !centerLng) {
-    const locLower = (locationName || "").toLowerCase();
-    const matchedCityKey = Object.keys(CITY_COORDINATES).find((key) =>
-      locLower.includes(key)
-    );
-    if (matchedCityKey) {
-      centerLat = CITY_COORDINATES[matchedCityKey].lat;
-      centerLng = CITY_COORDINATES[matchedCityKey].lng;
-    } else {
-      // Default to Mumbai Marine Drive
-      centerLat = 18.9438;
-      centerLng = 72.8232;
-    }
+  const hasCoordinates = Array.isArray(coordinates) && coordinates.length > 0;
+
+  // Build real route from provided coordinates or start point
+  let route = [];
+  if (hasCoordinates) {
+    route = coordinates;
+  } else if (hasValidStart) {
+    route = [[Number(startLat), Number(startLng)]];
   }
 
-  // Construct full route polyline
-  const route =
-    coordinates && Array.isArray(coordinates) && coordinates.length > 1
-      ? coordinates
-      : generateRaceLoop(Number(centerLat), Number(centerLng));
+  // If no coordinates are available at all, show an informative empty state instead of fake map
+  if (route.length === 0) {
+    return (
+      <div
+        className="rounded-2xl overflow-hidden border border-white/10 bg-slate-900/60 p-8 flex flex-col items-center justify-center text-center shadow-xl"
+        style={{ height }}
+      >
+        <div className="w-14 h-14 rounded-full bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-2xl text-orange-400 mb-3">
+          📍
+        </div>
+        <h4 className="text-white font-semibold text-lg mb-1">Route Map Not Specified</h4>
+        <p className="text-gray-400 text-sm max-w-sm">
+          The organizer has not set exact map route coordinates for {locationName || "this event"} yet.
+        </p>
+      </div>
+    );
+  }
+
+  const centerLat = route[0][0];
+  const centerLng = route[0][1];
 
   return (
     <div
@@ -106,7 +95,7 @@ export default function RouteMap({
     >
       <MapContainer
         center={[centerLat, centerLng]}
-        zoom={13}
+        zoom={14}
         style={{ height: "100%", width: "100%", zIndex: 1 }}
         scrollWheelZoom={false}
       >
@@ -149,3 +138,4 @@ export default function RouteMap({
     </div>
   );
 }
+

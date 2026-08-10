@@ -1,8 +1,15 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { HiCheckCircle, HiTicket, HiShieldCheck } from "react-icons/hi";
+import { useParams, Link } from "react-router-dom";
+import {
+  HiCheckCircle,
+  HiTicket,
+  HiShieldCheck,
+  HiArrowRight,
+  HiCalendar,
+  HiCreditCard,
+  HiHashtag,
+} from "react-icons/hi";
 import { getPayment } from "../../services/paymentService";
-import Button from "../../components/Common/Button";
 
 export default function PaymentConfirmation() {
   const { paymentId } = useParams();
@@ -16,78 +23,119 @@ export default function PaymentConfirmation() {
 
   if (!payment) {
     return (
-      <div className="loading-center">
+      <div className="loading-center min-h-[60vh] flex flex-col items-center justify-center gap-4">
         <div className="loading-spinner" />
+        <p className="text-gray-400 text-sm">Verifying transaction details...</p>
       </div>
     );
   }
 
-  const details = [
-    ["Event Name", payment.event_title],
-    ["Assigned Bib Number", payment.bib_number || "BIB-CONFIRMED"],
-    ["Amount Paid", `₹${payment.amount}`],
-    ["Transaction Reference", payment.transaction_ref || payment.razorpay_payment_id || `TXN${payment.id}982`],
-    ["Payment Method", (payment.payment_method || "UPI").toUpperCase()],
-    ["Status", "CONFIRMED & PAID"],
-  ];
+  const txnId =
+    payment.transaction_ref ||
+    payment.razorpay_payment_id ||
+    `TXN${payment.id}982`;
 
   return (
-    <div className="participant-page">
-      <div className="participant-flow">
+    <div className="participant-page py-12 px-4">
+      
+      <div className="confirmation-card">
         
-        <div className="flow-panel border border-emerald-500/30 text-center space-y-6 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -z-0 pointer-events-none" />
-          
-          <div className="w-20 h-20 rounded-full bg-emerald-500/15 text-emerald-400 flex items-center justify-center text-5xl mx-auto border border-emerald-500/30 shadow-lg shadow-emerald-500/20">
-            <HiCheckCircle />
-          </div>
-
-          <div>
-            <span className="inline-block px-4 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold tracking-[0.25em] uppercase mb-3">
-              Entry Verified
-            </span>
-            <h1 className="font-display text-3xl sm:text-4xl text-white tracking-tight">
-              Registration Confirmed!
-            </h1>
-            <p className="text-gray-400 text-sm mt-2 max-w-md mx-auto">
-              Your payment of <span className="text-emerald-400 font-bold">₹{payment.amount}</span> was processed successfully.
-            </p>
-          </div>
-
-          {/* Details Table */}
-          <div className="p-6 rounded-2xl bg-[#161618] border border-white/10 text-left space-y-3.5">
-            {details.map(([label, value]) => (
-              <div key={label} className="flex justify-between items-center text-sm border-b border-white/5 pb-2.5 last:border-0 last:pb-0 gap-4">
-                <span className="text-gray-400 text-xs uppercase tracking-wider font-medium shrink-0">{label}</span>
-                <span
-                  className={`text-right font-semibold ${
-                    label === "Assigned Bib Number"
-                      ? "text-brand font-bold text-base"
-                      : label === "Status"
-                      ? "text-emerald-400 font-bold"
-                      : "text-white"
-                  }`}
-                >
-                  {value}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          <div className="pt-2 flex flex-col sm:flex-row gap-4">
-            <Button to="/profile" variant="primary" size="lg" className="flex-1 justify-center font-display font-semibold uppercase" showArrow={false}>
-              <HiTicket className="mr-1.5 text-lg" /> View My Profile & Pass
-            </Button>
-            <Button to="/events" variant="outline" size="lg" className="flex-1 justify-center font-display font-semibold uppercase" showArrow={false}>
-              Browse More Events
-            </Button>
-          </div>
-
-          <p className="text-xs text-gray-500 flex items-center justify-center gap-1.5">
-            <HiShieldCheck className="text-emerald-400 text-sm" /> Official RunCrew Race Entry Pass
-          </p>
+        {/* Success Icon */}
+        <div className="confirmation-icon-circle">
+          <HiCheckCircle />
         </div>
+
+        {/* Verification Status Pill */}
+        <div className="confirmation-pill">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          Entry Verified & Confirmed
+        </div>
+
+        {/* Title & Subtitle */}
+        <h1 className="confirmation-title">You're All Set to Run!</h1>
+        <p className="confirmation-subtitle">
+          Your payment of <strong className="text-white">₹{payment.amount}</strong> was successfully completed. Your official race pass has been generated.
+        </p>
+
+        {/* Race Pass Ticket Voucher */}
+        <div className="confirmation-ticket">
+          
+          {/* Header */}
+          <div className="confirmation-ticket-header">
+            <div>
+              <div className="confirmation-ticket-label flex items-center gap-1">
+                <HiCalendar className="text-[#f15a24]" /> Official Event Pass
+              </div>
+              <div className="confirmation-ticket-event">
+                {payment.event_title || "Marathon Race"}
+              </div>
+            </div>
+
+            {/* BIB Tag */}
+            <div className="confirmation-bib-tag">
+              <div className="confirmation-bib-title">BIB NUMBER</div>
+              <div className="confirmation-bib-code">
+                {payment.bib_number || "BIB-CONFIRMED"}
+              </div>
+            </div>
+          </div>
+
+          {/* Details Body */}
+          <div className="confirmation-ticket-body">
+            <div className="confirmation-detail-box">
+              <div className="confirmation-detail-key">Amount Paid</div>
+              <div className="confirmation-detail-val">₹{payment.amount}</div>
+            </div>
+
+            <div className="confirmation-detail-box">
+              <div className="confirmation-detail-key">Payment Method</div>
+              <div className="confirmation-detail-val flex items-center gap-1.5 capitalize">
+                <HiCreditCard className="text-[#f15a24]" />
+                {payment.payment_method || "Online Pay"}
+              </div>
+            </div>
+
+            <div className="confirmation-detail-box full-width">
+              <div className="confirmation-detail-key">Transaction Reference</div>
+              <div className="confirmation-detail-val mono flex items-center gap-1">
+                <HiHashtag className="text-gray-500 shrink-0" />
+                {txnId}
+              </div>
+            </div>
+          </div>
+
+          {/* Footer Badge */}
+          <div className="confirmation-ticket-footer">
+            <span className="flex items-center gap-1.5">
+              <HiShieldCheck className="text-base" /> Status: CONFIRMED & PAID
+            </span>
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider">
+              RunCrew Verified
+            </span>
+          </div>
+
+        </div>
+
+        {/* Buttons */}
+        <div className="confirmation-actions">
+          <Link to="/profile" className="btn-primary-custom">
+            <HiTicket className="text-lg" />
+            View My Profile & Pass
+          </Link>
+
+          <Link to="/events" className="btn-secondary-custom">
+            Browse Events
+            <HiArrowRight />
+          </Link>
+        </div>
+
+        {/* Footer note */}
+        <div className="confirmation-footer-note">
+          <HiShieldCheck className="text-emerald-400 text-sm" /> Official RunCrew Digital Entry Pass • Present at race day check-in
+        </div>
+
       </div>
+
     </div>
   );
 }

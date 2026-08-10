@@ -1,3 +1,5 @@
+from django.core.mail import send_mail
+from django.conf import settings
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -40,7 +42,7 @@ class RegistrationListCreateView(APIView):
         except Event.DoesNotExist:
             return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
 
-        if Registration.objects.filter(user=request.user, event=event).exists():
+        if Registration.objects.filter(user=request.user, event=event).exclude(status='cancelled').exists():
             return Response(
                 {'error': 'Already registered for this event'},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -55,6 +57,26 @@ class RegistrationListCreateView(APIView):
             registration = serializer.save(user=request.user)
             registration.bib_number = f"BIB{registration.id:04d}"
             registration.save()
+
+            # Send SMTP booking confirmation email
+            send_mail(
+                subject=f"RunCrew Event Registration Booked - {registration.event.title}",
+                message=(
+                    f"Hi {registration.user.first_name or registration.user.username},\n\n"
+                    f"Your registration booking for '{registration.event.title}' has been received successfully!\n\n"
+                    f"Bib Number: {registration.bib_number}\n"
+                    f"Event Date: {registration.event.date}\n"
+                    f"Location: {registration.event.location}\n"
+                    f"Entry Fee: ₹{registration.event.fees}\n\n"
+                    f"Please complete your payment to finalize your official entry.\n\n"
+                    f"Thank you for choosing RunCrew!\n\n"
+                    f"RunCrew Team"
+                ),
+                from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', None),
+                recipient_list=[registration.user.email],
+                fail_silently=True,
+            )
+
             return Response(
                 RegistrationSerializer(registration).data,
                 status=status.HTTP_201_CREATED,

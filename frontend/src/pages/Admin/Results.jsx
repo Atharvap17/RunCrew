@@ -1,118 +1,282 @@
-import { useEffect, useState } from "react";
-import { getResults, createResult, deleteResult } from "../../services/resultService";
-import { getRegistrations } from "../../services/registrationService";
-import Button from "../../components/Common/Button";
-
-export default function AdminResults() {
-  const [results, setResults] = useState([]);
-  const [registrations, setRegistrations] = useState([]);
-  const [form, setForm] = useState({ registration: "", finish_time: "01:30:00", rank: "", notes: "" });
-  const [showForm, setShowForm] = useState(false);
-
-  useEffect(() => { load(); }, []);
-
-  async function load() {
-    const [res, regs] = await Promise.all([getResults(), getRegistrations()]);
-    setResults(res.data);
-    setRegistrations(regs.data.filter((r) => r.payment_status === "completed"));
-  }
-
-  const handleCreate = async (e) => {
-    e.preventDefault();
-    await createResult({ ...form, rank: form.rank ? Number(form.rank) : null });
-    setShowForm(false);
-    setForm({ registration: "", finish_time: "01:30:00", rank: "", notes: "" });
-    load();
-  };
-
-  const handleDelete = async (id) => {
-    if (!confirm("Delete this result?")) return;
-    await deleteResult(id);
-    load();
-  };
-
-  return (
-    <div className="organizer-page">
-      <header className="organizer-page__header">
-        <div>
-          <p className="section-label">Admin</p>
-          <h1 className="organizer-page__title">Race results</h1>
-          <p className="organizer-page__subtitle">Publish finish times and rankings for completed events.</p>
-        </div>
-        <Button type="button" variant="primary" size="sm" showArrow={false} onClick={() => setShowForm(!showForm)}>
-          {showForm ? "Cancel" : "Add result"}
-        </Button>
-      </header>
-
-      {showForm && (
-        <form onSubmit={handleCreate} className="organizer-card organizer-form mb-8 grid md:grid-cols-2 gap-4">
-          <div className="md:col-span-2">
-            <label className="organizer-label" htmlFor="registration">Registration</label>
-            <select
-              id="registration"
-              className="form-select form-select--left"
-              value={form.registration}
-              onChange={(e) => setForm({ ...form, registration: e.target.value })}
-              required
-            >
-              <option value="">Select registration</option>
-              {registrations.map((r) => (
-                <option key={r.id} value={r.id}>
-                  {r.user_name} — {r.event_title} ({r.bib_number})
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="organizer-label" htmlFor="finish_time">Finish time</label>
-            <input id="finish_time" className="form-input" placeholder="HH:MM:SS" value={form.finish_time} onChange={(e) => setForm({ ...form, finish_time: e.target.value })} required />
-          </div>
-          <div>
-            <label className="organizer-label" htmlFor="rank">Rank</label>
-            <input id="rank" className="form-input" type="number" placeholder="Rank" value={form.rank} onChange={(e) => setForm({ ...form, rank: e.target.value })} />
-          </div>
-          <div className="md:col-span-2">
-            <label className="organizer-label" htmlFor="notes">Notes</label>
-            <input id="notes" className="form-input" placeholder="Optional notes" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
-          </div>
-          <div className="md:col-span-2">
-            <Button type="submit" variant="primary" size="sm" showArrow={false}>Save result</Button>
-          </div>
-        </form>
-      )}
-
-      <div className="organizer-table-panel">
-        <table className="organizer-data-table">
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Runner</th>
-              <th>Bib</th>
-              <th>Event</th>
-              <th>Time</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {results.map((r) => (
-              <tr key={r.id}>
-                <td className="text-white font-display text-lg">#{r.rank || "—"}</td>
-                <td className="text-white">{r.user_name}</td>
-                <td className="text-brand font-semibold">{r.bib_number}</td>
-                <td>{r.event_title}</td>
-                <td className="font-mono text-sm">{r.finish_time}</td>
-                <td>
-                  <button onClick={() => handleDelete(r.id)} className="text-red-400 hover:text-red-300 text-xs font-semibold uppercase tracking-wide">
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {results.length === 0 && <p className="organizer-empty">No results published yet.</p>}
-      </div>
-    </div>
-  );
-}
-
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  FaTrophy,
+  FaChevronRight,
+  FaPlus,
+  FaTrashAlt,
+  FaTimes,
+  FaStopwatch,
+  FaCheck,
+} from "react-icons/fa";
+import {
+  getResults,
+  createResult,
+  deleteResult,
+} from "../../services/resultService";
+import { getRegistrations } from "../../services/registrationService";
+
+export default function AdminResults() {
+  const [results, setResults] = useState([]);
+  const [registrations, setRegistrations] = useState([]);
+  const [form, setForm] = useState({
+    registration: "",
+    finish_time: "01:30:00",
+    rank: "",
+    notes: "",
+  });
+  const [showForm, setShowForm] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const [res, regs] = await Promise.all([getResults(), getRegistrations()]);
+      setResults(res.data);
+      setRegistrations(
+        regs.data.filter((r) => r.payment_status === "completed")
+      );
+    } catch (err) {
+      console.error("Failed to load results:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleCreate = async (e) => {
+    e.preventDefault();
+    await createResult({
+      ...form,
+      rank: form.rank ? Number(form.rank) : null,
+    });
+    setShowForm(false);
+    setForm({ registration: "", finish_time: "01:30:00", rank: "", notes: "" });
+    load();
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm("Delete this race result entry?")) return;
+    await deleteResult(id);
+    load();
+  };
+
+  return (
+    <div>
+      {/* Volt Header */}
+      <div className="volt-page-header">
+        <div>
+          <div className="volt-breadcrumb">
+            <Link to="/admin">Admin</Link>
+            <FaChevronRight className="text-[10px]" />
+            <span>Race Results</span>
+          </div>
+          <div className="volt-page-title">
+            <h1>Race Results Leaderboard</h1>
+            <p className="volt-page-subtitle">
+              Publish finish timings, bib rankings, and leaderboard standings for completed events.
+            </p>
+          </div>
+        </div>
+
+        <div className="volt-action-btns">
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="volt-btn volt-btn--primary"
+          >
+            {showForm ? <FaTimes /> : <FaPlus />}
+            <span>{showForm ? "Cancel" : "Add Race Result"}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Volt Form Modal/Panel */}
+      {showForm && (
+        <div className="volt-panel mb-8">
+          <div className="volt-panel-header">
+            <div className="volt-panel-title">
+              <FaTrophy />
+              <span>Publish Participant Result</span>
+            </div>
+            <button
+              className="volt-btn volt-btn--secondary volt-btn--sm"
+              onClick={() => setShowForm(false)}
+            >
+              <FaTimes />
+            </button>
+          </div>
+
+          <form onSubmit={handleCreate} className="grid md:grid-cols-2 gap-4">
+            <div className="md:col-span-2 volt-form-group">
+              <label className="volt-label" htmlFor="registration">
+                Participant Registration
+              </label>
+              <select
+                id="registration"
+                className="volt-select"
+                value={form.registration}
+                onChange={(e) => setForm({ ...form, registration: e.target.value })}
+                required
+              >
+                <option value="">Select paid registration entry</option>
+                {registrations.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.user_name} — {r.event_title} (Bib #{r.bib_number})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="volt-form-group">
+              <label className="volt-label" htmlFor="finish_time">
+                Finish Time (HH:MM:SS)
+              </label>
+              <input
+                id="finish_time"
+                className="volt-input"
+                placeholder="HH:MM:SS"
+                value={form.finish_time}
+                onChange={(e) => setForm({ ...form, finish_time: e.target.value })}
+                required
+              />
+            </div>
+
+            <div className="volt-form-group">
+              <label className="volt-label" htmlFor="rank">
+                Position Rank
+              </label>
+              <input
+                id="rank"
+                className="volt-input"
+                type="number"
+                placeholder="Overall rank (1, 2, 3...)"
+                value={form.rank}
+                onChange={(e) => setForm({ ...form, rank: e.target.value })}
+              />
+            </div>
+
+            <div className="md:col-span-2 volt-form-group">
+              <label className="volt-label" htmlFor="notes">
+                Notes / Category Details
+              </label>
+              <input
+                id="notes"
+                className="volt-input"
+                placeholder="Optional notes (e.g. Category Winner, Personal Best)"
+                value={form.notes}
+                onChange={(e) => setForm({ ...form, notes: e.target.value })}
+              />
+            </div>
+
+            <div className="md:col-span-2 flex justify-end gap-3 pt-2">
+              <button
+                type="button"
+                className="volt-btn volt-btn--secondary"
+                onClick={() => setShowForm(false)}
+              >
+                Cancel
+              </button>
+              <button type="submit" className="volt-btn volt-btn--primary">
+                <FaCheck /> Save & Publish Result
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Volt Table Panel */}
+      <div className="volt-panel">
+        <div className="volt-panel-header">
+          <div className="volt-panel-title">
+            <FaTrophy />
+            <span>Leaderboard Results ({results.length})</span>
+          </div>
+        </div>
+
+        <div className="volt-table-container">
+          {loading ? (
+            <div className="volt-empty">Loading race results...</div>
+          ) : results.length === 0 ? (
+            <div className="volt-empty">No results published yet.</div>
+          ) : (
+            <table className="volt-table">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Runner</th>
+                  <th>Bib #</th>
+                  <th>Event</th>
+                  <th>Finish Time</th>
+                  <th>Notes</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {results.map((r) => {
+                  const initial = r.user_name
+                    ? r.user_name.charAt(0).toUpperCase()
+                    : "R";
+                  return (
+                    <tr key={r.id}>
+                      <td>
+                        <span
+                          className={`volt-badge ${
+                            r.rank === 1
+                              ? "volt-badge--brand"
+                              : r.rank === 2 || r.rank === 3
+                              ? "volt-badge--warning"
+                              : "volt-badge--info"
+                          } font-bold font-mono text-xs`}
+                        >
+                          #{r.rank || "—"}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="volt-user-cell">
+                          <div className="volt-avatar">{initial}</div>
+                          <div>
+                            <div className="volt-user-cell-name">{r.user_name}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span className="volt-badge volt-badge--brand font-mono">
+                          #{r.bib_number || "TBD"}
+                        </span>
+                      </td>
+                      <td>
+                        <span className="text-white font-medium">{r.event_title}</span>
+                      </td>
+                      <td>
+                        <div className="flex items-center gap-2 font-mono text-emerald-400 font-bold">
+                          <FaStopwatch />
+                          <span>{r.finish_time}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <span className="text-gray-400 text-xs">
+                          {r.notes || "—"}
+                        </span>
+                      </td>
+                      <td>
+                        <button
+                          onClick={() => handleDelete(r.id)}
+                          className="volt-btn volt-btn--danger volt-btn--sm"
+                        >
+                          <FaTrashAlt /> Delete
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

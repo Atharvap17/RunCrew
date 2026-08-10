@@ -27,3 +27,12 @@ class RaceResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = RaceResult
         fields = '__all__'
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if instance.finish_time:
+            total_seconds = int(instance.finish_time.total_seconds())
+            hours, remainder = divmod(total_seconds, 3600)
+            minutes, seconds = divmod(remainder, 60)
+            ret['finish_time'] = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+        return ret

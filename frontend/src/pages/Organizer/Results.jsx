@@ -73,141 +73,152 @@ export default function Results() {
 
   return (
     <div className="organizer-page">
-        <div className="organizer-page__header">
-          <div>
+      <div className="organizer-page__header">
+        <div>
           <p className="section-label">Organizer</p>
           <h1 className="organizer-page__title">Results</h1>
           <p className="organizer-page__subtitle">Publish finish times and rank details after your marathon events are complete.</p>
-          </div>
         </div>
+      </div>
 
-        {error && (
-          <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            {error}
-          </div>
-        )}
-
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-white">Race Results</h2>
-            <p className="text-sm text-gray-400">Add runner finish data or remove incorrect entries.</p>
-          </div>
-          <Button variant="primary" onClick={() => setShowForm(!showForm)}>
-            {showForm ? "Hide form" : "+ Add Result"}
-          </Button>
+      {error && (
+        <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          {error}
         </div>
+      )}
 
-        {showForm && (
-          <form onSubmit={handleCreate} className="organizer-card organizer-form mb-8">
-            <div className="grid gap-4 lg:grid-cols-2">
-              <div>
-                <label className="organizer-label">Registration</label>
-                <select
-                  className="form-select"
-                  value={form.registration}
-                  onChange={(e) => setForm({ ...form, registration: e.target.value })}
-                  required
-                >
-                  <option value="">Select a registration</option>
-                  {registrations.map((reg) => (
-                    <option key={reg.id} value={reg.id}>
-                      {reg.user_name} — {reg.event_title} ({reg.bib_number})
-                    </option>
-                  ))}
-                </select>
-              </div>
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-white">Race Results</h2>
+          <p className="text-sm text-gray-400">Add runner finish data or remove incorrect entries.</p>
+        </div>
+        <Button variant="primary" onClick={() => setShowForm(!showForm)}>
+          {showForm ? "Hide form" : "+ Add Result"}
+        </Button>
+      </div>
 
-              <div>
-                <label className="organizer-label">Finish Time</label>
-                <input
-                  type="time"
-                  className="form-input"
-                  value={form.finish_time}
-                  onChange={(e) => setForm({ ...form, finish_time: e.target.value })}
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="organizer-label">Rank</label>
-                <input
-                  type="number"
-                  min="1"
-                  className="form-input"
-                  value={form.rank}
-                  onChange={(e) => setForm({ ...form, rank: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <label className="organizer-label">Notes</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={form.notes}
-                  onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                />
-              </div>
+      {showForm && (
+        <form onSubmit={handleCreate} className="organizer-card organizer-form mb-8">
+          <div className="grid gap-4 lg:grid-cols-2">
+            <div>
+              <label className="organizer-label">Registration</label>
+              <select
+                className="form-select"
+                value={form.registration}
+                onChange={(e) => setForm({ ...form, registration: e.target.value })}
+                required
+              >
+                <option value="">Select a registration</option>
+                {Object.entries(
+                  registrations.reduce((acc, reg) => {
+                    const title = reg.event_title || "Other Event";
+                    if (!acc[title]) acc[title] = [];
+                    acc[title].push(reg);
+                    return acc;
+                  }, {})
+                ).map(([eventTitle, regList]) => (
+                  <optgroup key={eventTitle} label={eventTitle}>
+                    {regList.map((reg) => (
+                      <option key={reg.id} value={reg.id}>
+                        {reg.user_name} (Bib #{reg.bib_number || "TBD"})
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
             </div>
 
-            <div className="mt-6 flex flex-wrap justify-end gap-3">
-              <Button variant="outline" type="button" onClick={() => setShowForm(false)} showArrow={false}>
-                Cancel
-              </Button>
-              <Button variant="primary" type="submit" disabled={saving} showArrow={false}>
-                {saving ? "Saving..." : "Save Result"}
-              </Button>
+            <div>
+              <label className="organizer-label">Finish Time</label>
+              <input
+                type="time"
+                className="form-input"
+                value={form.finish_time}
+                onChange={(e) => setForm({ ...form, finish_time: e.target.value })}
+                required
+              />
             </div>
-          </form>
-        )}
 
-        <div className="organizer-table-panel">
-          <table className="organizer-data-table">
-            <thead>
+            <div>
+              <label className="organizer-label">Rank</label>
+              <input
+                type="number"
+                min="1"
+                className="form-input"
+                value={form.rank}
+                onChange={(e) => setForm({ ...form, rank: e.target.value })}
+              />
+            </div>
+
+            <div>
+              <label className="organizer-label">Notes</label>
+              <input
+                type="text"
+                className="form-input"
+                value={form.notes}
+                onChange={(e) => setForm({ ...form, notes: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div className="mt-6 flex flex-wrap justify-end gap-3">
+            <Button variant="outline" type="button" onClick={() => setShowForm(false)} showArrow={false}>
+              Cancel
+            </Button>
+            <Button variant="primary" type="submit" disabled={saving} showArrow={false}>
+              {saving ? "Saving..." : "Save Result"}
+            </Button>
+          </div>
+        </form>
+      )}
+
+      <div className="organizer-table-panel">
+        <table className="organizer-data-table">
+          <thead>
+            <tr>
+              <th className="px-4 py-4">Rank</th>
+              <th className="px-4 py-4">Runner</th>
+              <th className="px-4 py-4">Bib</th>
+              <th className="px-4 py-4">Event</th>
+              <th className="px-4 py-4">Time</th>
+              <th className="px-4 py-4">Notes</th>
+              <th className="px-4 py-4">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
               <tr>
-                <th className="px-4 py-4">Rank</th>
-                <th className="px-4 py-4">Runner</th>
-                <th className="px-4 py-4">Bib</th>
-                <th className="px-4 py-4">Event</th>
-                <th className="px-4 py-4">Time</th>
-                <th className="px-4 py-4">Notes</th>
-                <th className="px-4 py-4">Actions</th>
+                <td colSpan="7" className="p-8 text-center text-gray-400">Loading results...</td>
               </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan="7" className="p-8 text-center text-gray-400">Loading results...</td>
+            ) : results.length === 0 ? (
+              <tr>
+                <td colSpan="7" className="p-8 text-center text-gray-400">No results published yet.</td>
+              </tr>
+            ) : (
+              results.map((result) => (
+                <tr key={result.id}>
+                  <td className="px-4 py-4 text-white">{result.rank || "—"}</td>
+                  <td className="px-4 py-4 text-gray-300">{result.user_name}</td>
+                  <td className="px-4 py-4 text-brand">{result.bib_number}</td>
+                  <td className="px-4 py-4 text-gray-300">{result.event_title}</td>
+                  <td className="px-4 py-4 text-white">{result.finish_time}</td>
+                  <td className="px-4 py-4 text-gray-300">{result.notes || "—"}</td>
+                  <td className="px-4 py-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDelete(result.id)}
+                      showArrow={false}
+                    >
+                      Delete
+                    </Button>
+                  </td>
                 </tr>
-              ) : results.length === 0 ? (
-                <tr>
-                  <td colSpan="7" className="p-8 text-center text-gray-400">No results published yet.</td>
-                </tr>
-              ) : (
-                results.map((result) => (
-                  <tr key={result.id}>
-                    <td className="px-4 py-4 text-white">{result.rank || "—"}</td>
-                    <td className="px-4 py-4 text-gray-300">{result.user_name}</td>
-                    <td className="px-4 py-4 text-brand">{result.bib_number}</td>
-                    <td className="px-4 py-4 text-gray-300">{result.event_title}</td>
-                    <td className="px-4 py-4 text-white">{result.finish_time}</td>
-                    <td className="px-4 py-4 text-gray-300">{result.notes || "—"}</td>
-                    <td className="px-4 py-4">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDelete(result.id)}
-                        showArrow={false}
-                      >
-                        Delete
-                      </Button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

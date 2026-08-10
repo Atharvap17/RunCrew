@@ -1,4 +1,5 @@
 import random
+import uuid
 from datetime import timedelta
 
 from django.contrib.auth import get_user_model
@@ -122,9 +123,13 @@ class VerifyOTPView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        reset_token = uuid.uuid4().hex
+        otp_record.reset_token = reset_token
+        otp_record.save()
+
         return Response({
             'message': 'OTP verified successfully',
-            'reset_token': str(otp_record.id),
+            'reset_token': reset_token,
         })
 
 
@@ -145,7 +150,7 @@ class ResetPasswordView(APIView):
         try:
             user = User.objects.get(email=email)
             otp_record = PasswordResetOTP.objects.get(
-                id=reset_token,
+                reset_token=reset_token,
                 user=user,
                 is_used=False,
                 created_at__gte=timezone.now() - timedelta(minutes=10),

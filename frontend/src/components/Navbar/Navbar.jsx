@@ -14,7 +14,7 @@ const links = [
 ];
 
 export default function Navbar() {
-  const { user, logout, isAdmin } = useAuth();
+  const { user, logout, isAdmin, isOrganizer } = useAuth();
   const [open, setOpen] = useState(false);
 
   return (
@@ -52,6 +52,13 @@ export default function Navbar() {
             <li>
               <NavLink to="/profile" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
                 Profile
+              </NavLink>
+            </li>
+          )}
+          {isOrganizer && (
+            <li>
+              <NavLink to="/organizer" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
+                Organizer
               </NavLink>
             </li>
           )}
@@ -102,6 +109,21 @@ export default function Navbar() {
               {l.label}
             </Link>
           ))}
+          {user && (
+            <Link to="/profile" onClick={() => setOpen(false)} className="block nav-link py-2">
+              Profile
+            </Link>
+          )}
+          {isOrganizer && (
+            <Link to="/organizer" onClick={() => setOpen(false)} className="block nav-link py-2">
+              Organizer
+            </Link>
+          )}
+          {isAdmin && (
+            <Link to="/admin" onClick={() => setOpen(false)} className="block nav-link py-2">
+              Admin
+            </Link>
+          )}
           <div className="flex flex-col gap-3 pt-4 border-t border-white/10">
             {user ? (
               <Button variant="outline" size="sm" onClick={() => { logout(); setOpen(false); }} showArrow={false}>

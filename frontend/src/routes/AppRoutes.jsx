@@ -34,6 +34,7 @@ import AdminEvents from "../pages/Admin/Events";
 import AdminRegistrations from "../pages/Admin/Registrations";
 import AdminPayments from "../pages/Admin/Payments";
 import AdminResults from "../pages/Admin/Results";
+import AdminSettings from "../pages/Admin/Settings";
 
 export default function AppRoutes() {
   return (
@@ -74,6 +75,7 @@ export default function AppRoutes() {
           <Route path="registrations" element={<AdminRegistrations />} />
           <Route path="payments" element={<AdminPayments />} />
           <Route path="results" element={<AdminResults />} />
+          <Route path="settings" element={<AdminSettings />} />
         </Route>
 
         <Route

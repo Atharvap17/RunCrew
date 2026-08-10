@@ -96,37 +96,52 @@ export default function EventDetails() {
         </div>
 
         <div>
-          <Card className="panel--lg participant-detail-sidebar">
-            <h3 className="font-display text-xl text-white mb-6">Event Details</h3>
-            <div className="space-y-4 text-sm">
-              {[
-                ["Date", event.date],
-                ["Time", event.time?.slice(0, 5)],
-                ["Distance", event.distance],
-                ["Registration Fee", `₹${event.fees}`],
-                ["Spots Left", event.max_participants - (event.registered_count || 0)],
-              ].map(([label, value]) => (
-                <div key={label} className="flex justify-between gap-4 border-b border-white/10 pb-3">
-                  <span className="text-gray-400 font-medium">{label}</span>
-                  <span className={label === "Distance" ? "text-brand font-semibold text-right" : label === "Registration Fee" ? "text-white font-bold text-right" : "text-white text-right"}>
-                    {value}
-                  </span>
-                </div>
-              ))}
+          <div className="participant-detail-sidebar">
+            <h3 className="font-display text-2xl text-white font-bold mb-6">Event Details</h3>
+
+            <div>
+              <div className="event-details-row">
+                <span className="text-gray-400 font-medium">Date</span>
+                <span className="text-white font-semibold text-right">{event.date}</span>
+              </div>
+
+              <div className="event-details-row">
+                <span className="text-gray-400 font-medium">Time</span>
+                <span className="text-white font-semibold text-right">{event.time ? `${event.time.slice(0, 5)} AM` : "05:00 AM"}</span>
+              </div>
+
+              <div className="event-details-row">
+                <span className="text-gray-400 font-medium">Distance</span>
+                <span className="text-[#f15a24] font-bold text-right tracking-wide">{event.distance}</span>
+              </div>
+
+              <div className="event-details-row">
+                <span className="text-gray-400 font-medium">Registration Fee</span>
+                <span className="text-white font-bold text-right text-base">₹{event.fees}</span>
+              </div>
+
+              <div className="event-details-row">
+                <span className="text-gray-400 font-medium">Spots Left</span>
+                <span className="text-amber-400 font-bold text-right text-base">
+                  {event.max_participants - (event.registered_count || 0)}
+                </span>
+              </div>
             </div>
 
             {event.status === "upcoming" && (
-              <Button
-                onClick={handleRegister}
-                variant="primary"
-                size="lg"
-                className="w-full justify-center mt-8"
-                showArrow={false}
-              >
-                Register Now
-              </Button>
+              <div className="mt-8">
+                <Button
+                  onClick={handleRegister}
+                  variant="primary"
+                  size="lg"
+                  className="w-full justify-center text-sm font-display font-bold uppercase tracking-wider"
+                  showArrow={false}
+                >
+                  Register Now
+                </Button>
+              </div>
             )}
-          </Card>
+          </div>
         </div>
       </div>
     </div>
