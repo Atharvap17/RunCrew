@@ -7,13 +7,12 @@ import Button from "../../components/Common/Button";
 
 export default function Register() {
   const [form, setForm] = useState({
-    first_name: "",
-    last_name: "",
-    email: "",
-    password: "",
-    confirm_password: "",
-    role: "participant",
-  });
+  first_name: "",
+  last_name: "",
+  email: "",
+  password: "",
+  confirm_password: "",
+ });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -36,7 +35,6 @@ export default function Register() {
         email: form.email,
         password: form.password,
         confirm_password: form.confirm_password,
-        role: form.role,
       });
       navigate("/login", {
         state: { message: "Registration successful. Please login to continue." },
@@ -151,77 +149,6 @@ export default function Register() {
                 error={errors.confirm_password?.[0] || errors.confirm_password}
                 required
               />
-            </div>
-
-            <div className="pt-5 border-t border-white/10 flex flex-col gap-3">
-              <div className="text-center">
-                <label className="block text-xs font-semibold uppercase tracking-wider text-brand mb-1">
-                  Register As
-                </label>
-                <p className="text-xs text-gray-400">
-                  Select your role to tailor your experience on RunCrew.
-                </p>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-2">
-                <label
-                  className={`group flex cursor-pointer gap-3.5 p-3.5 rounded-xl border transition-all duration-200 ${
-                    form.role === "participant"
-                      ? "bg-brand/10 border-brand text-white shadow-md shadow-brand/10"
-                      : "bg-[#121214] border-white/10 text-gray-300 hover:border-white/20 hover:bg-[#18181b]"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="role"
-                    value="participant"
-                    checked={form.role === "participant"}
-                    onChange={(e) => setForm({ ...form, role: e.target.value })}
-                    className="sr-only"
-                  />
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand/15 text-brand text-xl">
-                    🏃
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-sm font-semibold text-white">Participant</div>
-                    <div className="text-xs text-gray-400 truncate mt-0.5">
-                      Book races & track progress.
-                    </div>
-                  </div>
-                </label>
-
-                <label
-                  className={`group flex cursor-pointer gap-3.5 p-3.5 rounded-xl border transition-all duration-200 ${
-                    form.role === "organizer"
-                      ? "bg-brand/10 border-brand text-white shadow-md shadow-brand/10"
-                      : "bg-[#121214] border-white/10 text-gray-300 hover:border-white/20 hover:bg-[#18181b]"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="role"
-                    value="organizer"
-                    checked={form.role === "organizer"}
-                    onChange={(e) => setForm({ ...form, role: e.target.value })}
-                    className="sr-only"
-                  />
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand/15 text-brand text-xl">
-                    🏁
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-sm font-semibold text-white">Organizer</div>
-                    <div className="text-xs text-gray-400 truncate mt-0.5">
-                      Create & manage marathons.
-                    </div>
-                  </div>
-                </label>
-              </div>
-
-              {errors.role && (
-                <p className="text-rose-400 text-xs mt-1 font-medium">
-                  {errors.role?.[0] || errors.role}
-                </p>
-              )}
             </div>
 
             <div className="pt-2">

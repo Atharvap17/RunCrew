@@ -1,0 +1,8 @@
+import { FaArrowRight, FaMapMarkerAlt, FaMedal, FaRunning } from "react-icons/fa";
+import Button from "../../components/Common/Button";
+
+const stats = [{ num: "50K+", label: "Runners registered", icon: FaRunning }, { num: "100+", label: "Events hosted", icon: FaMedal }, { num: "15+", label: "Cities covered", icon: FaMapMarkerAlt }];
+
+export default function About() {
+  return <div className="participant-page"><section className="participant-hero"><p className="section-label">Our story</p><h1>Made for the run ahead.</h1><p>RunCrew brings together meaningful races, motivated people, and the moments that make every finish line unforgettable.</p></section><section className="participant-about-grid"><article className="participant-story-card"><p className="participant-eyebrow">Who we are</p><h2>India’s home for better race days.</h2><p>From Mumbai’s coastal routes to Delhi’s historic boulevards, RunCrew helps runners discover events, register with confidence, and celebrate each personal milestone.</p><Button to="/events" variant="outline-brand" size="sm">Find a race</Button></article><div className="participant-stat-grid">{stats.map(({ num, label, icon: Icon }) => <div className="participant-stat" key={label}><Icon /><strong>{num}</strong><span>{label}</span></div>)}</div></section><section className="participant-mission"><p className="participant-eyebrow">Our mission</p><h2>Make every runner feel race-ready.</h2><p>We make discovering, joining, and remembering a marathon simple — so more people can experience the confidence, community, and joy that comes from crossing a finish line.</p><a href="/events">Explore upcoming races <FaArrowRight /></a></section></div>;
+}

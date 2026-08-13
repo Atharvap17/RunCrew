@@ -9,44 +9,58 @@ class RegisterSerializer(serializers.ModelSerializer):
         write_only=True,
         validators=[validate_password],
     )
-    confirm_password = serializers.CharField(write_only=True)
-    role = serializers.ChoiceField(
-        choices=[
-            ('participant', 'Participant'),
-            ('organizer', 'Organizer'),
-        ],
-        default='participant',
-        required=False,
-    )
 
-    class Meta: 
+    confirm_password = serializers.CharField(write_only=True)
+
+    class Meta:
         model = User
         fields = [
-            'id', 'username', 'email', 'password',
-            'confirm_password', 'first_name', 'last_name', 'role',
-            'phone', 'age', 'gender',
+            'id',
+            'username',
+            'email',
+            'password',
+            'confirm_password',
+            'first_name',
+            'last_name',
+            'phone',
+            'age',
+            'gender',
         ]
+
         extra_kwargs = {
-            'username': {'required': False, 'allow_blank': True},
-            'first_name': {'required': True},
-            'last_name': {'required': True},
+            'username': {
+                'required': False,
+                'allow_blank': True,
+            },
+            'first_name': {
+                'required': True,
+            },
+            'last_name': {
+                'required': True,
+            },
         }
 
     def validate(self, data):
         if data['password'] != data['confirm_password']:
             raise serializers.ValidationError(
-                {'confirm_password': 'Passwords do not match.'}
+                {
+                    'confirm_password': 'Passwords do not match.'
+                }
             )
+
         return data
 
     def create(self, validated_data):
         validated_data.pop('confirm_password')
-        # AbstractUser requires username; email auth stays as USERNAME_FIELD.
-        # New registration form does not collect username, so use email.
+
+        # Public registration is always for participants.
+        validated_data['role'] = 'participant'
+
+        # Use email as username if username is not provided.
         if not validated_data.get('username'):
             validated_data['username'] = validated_data['email']
-        return User.objects.create_user(**validated_data)
 
+        return User.objects.create_user(**validated_data)
 
 class UserSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
