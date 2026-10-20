@@ -49,8 +49,9 @@ export default function Login() {
     } catch (err) {
       setError(
         err.response?.data?.detail ||
-          err.response?.data?.error ||
-          "Invalid email or password"
+        err.response?.data?.error ||
+        err.message ||
+        "Invalid email or password"
       );
     } finally {
       setLoading(false);

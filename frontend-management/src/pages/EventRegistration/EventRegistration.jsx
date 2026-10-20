@@ -7,6 +7,8 @@ import { useAuth } from "../../context/AuthContext";
 import Input from "../../components/Common/Input";
 import Button from "../../components/Common/Button";
 
+import { isEventPassed } from "../../utils/dateUtils";
+
 export default function EventRegistration() {
   const { id } = useParams();
   const { user } = useAuth();
@@ -41,12 +43,21 @@ export default function EventRegistration() {
 
   useEffect(() => {
     getEvent(id)
-      .then(({ data }) => setEvent(data))
+      .then(({ data }) => {
+        setEvent(data);
+        if (isEventPassed(data) || data.status === "completed" || data.status === "cancelled") {
+          setError("Registration closed: This event date has already passed.");
+        }
+      })
       .catch(() => navigate("/events"));
   }, [id, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isEventPassed(event)) {
+      setError("Registration closed: This event date has already passed.");
+      return;
+    }
     setLoading(true);
     setError("");
     try {
@@ -315,7 +326,7 @@ export default function EventRegistration() {
               variant="primary"
               size="lg"
               className="w-full h-14 justify-center font-display font-semibold tracking-wider text-base uppercase shadow-xl shadow-brand/25 hover:shadow-brand/40 transition-all duration-300"
-              disabled={loading}
+              disabled={loading || isEventPassed(event)}
               showArrow={false}
             >
               {loading ? "Processing Entry..." : "Proceed to Payment"}

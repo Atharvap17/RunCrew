@@ -42,6 +42,14 @@ class RegistrationListCreateView(APIView):
         except Event.DoesNotExist:
             return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
 
+        from django.utils import timezone
+
+        if event.date < timezone.localdate() or event.status in ('completed', 'cancelled'):
+            return Response(
+                {'error': 'Registration is closed: This event date has already passed.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         if Registration.objects.filter(user=request.user, event=event).exclude(status='cancelled').exists():
             return Response(
                 {'error': 'Already registered for this event'},

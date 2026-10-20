@@ -27,9 +27,18 @@ class EventListCreateView(APIView):
         featured = request.query_params.get('featured')
         status_filter = request.query_params.get('status')
 
+        from django.utils import timezone
+        today = timezone.localdate()
+
         if featured == 'true':
             events = events.filter(is_featured=True)
-        if status_filter:
+
+        if status_filter == 'upcoming':
+            events = events.filter(status='upcoming', date__gte=today)
+        elif status_filter == 'completed':
+            from django.db.models import Q
+            events = events.filter(Q(status='completed') | Q(date__lt=today))
+        elif status_filter:
             events = events.filter(status=status_filter)
 
         return Response(EventSerializer(events, many=True).data)

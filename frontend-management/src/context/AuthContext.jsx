@@ -12,19 +12,50 @@ export function AuthProvider({ children }) {
     const savedUser = localStorage.getItem("user");
 
     if (token && savedUser) {
-      setUser(JSON.parse(savedUser));
-      api.defaults.headers.common.Authorization = `Bearer ${token}`;
+      const parsedUser = JSON.parse(savedUser);
+
+      if (
+        parsedUser.role === "admin" ||
+        parsedUser.role === "organizer"
+      ) {
+        setUser(parsedUser);
+        api.defaults.headers.common.Authorization = `Bearer ${token}`;
+      } else {
+        // Remove unauthorized participant session.
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("user");
+        delete api.defaults.headers.common.Authorization;
+      }
     }
+
     setLoading(false);
   }, []);
 
   const login = async (email, password) => {
-    const { data } = await api.post("/users/login/", { email, password });
+    const { data } = await api.post("/users/login/", {
+      email,
+      password,
+    });
+
+    const role = data.user?.role;
+
+    // Management frontend only allows Admin and Organizer.
+    if (role !== "admin" && role !== "organizer") {
+      throw new Error(
+        "This account does not have permission to access the management panel."
+      );
+    }
+
+    // Only Admin/Organizer credentials are stored.
     localStorage.setItem("accessToken", data.access);
     localStorage.setItem("refreshToken", data.refresh);
     localStorage.setItem("user", JSON.stringify(data.user));
+
     api.defaults.headers.common.Authorization = `Bearer ${data.access}`;
+
     setUser(data.user);
+
     return data;
   };
 
@@ -51,7 +82,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, login, register, logout, updateUser, isAdmin, isOrganizer}}
+      value={{ user, loading, login, register, logout, updateUser, isAdmin, isOrganizer }}
     >
       {children}
     </AuthContext.Provider>

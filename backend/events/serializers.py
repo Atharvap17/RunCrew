@@ -4,6 +4,7 @@ from .models import Event
 
 class EventSerializer(serializers.ModelSerializer):
     registered_count = serializers.SerializerMethodField()
+    is_past = serializers.SerializerMethodField()
 
     class Meta:
         model = Event
@@ -25,8 +26,13 @@ class EventSerializer(serializers.ModelSerializer):
             "status",
             "organizer",
             "registered_count",
+            "is_past",
         ]
-        read_only_fields = ["organizer", "registered_count"]
+        read_only_fields = ["organizer", "registered_count", "is_past"]
 
     def get_registered_count(self, obj):
         return obj.registration_set.count()
+
+    def get_is_past(self, obj):
+        from django.utils import timezone
+        return obj.date < timezone.localdate()

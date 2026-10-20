@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { HiLocationMarker } from "react-icons/hi";
+import { HiLockClosed } from "react-icons/hi";
 import { getEvent } from "../../services/eventService";
 import RouteMap from "../../components/Map/RouteMap";
 import { useAuth } from "../../context/AuthContext";
 import Button from "../../components/Common/Button";
 import Card from "../../components/Common/Card";
+import { isEventPassed } from "../../utils/dateUtils";
 
 export default function EventDetails() {
   const { id } = useParams();
@@ -30,6 +32,10 @@ export default function EventDetails() {
   }
 
   const handleRegister = () => {
+    if (isEventPassed(event)) {
+      alert("Registration closed: This event date has already passed.");
+      return;
+    }
     if (!user) {
       navigate("/login", { state: { from: { pathname: `/events/${id}/register` } } });
       return;
@@ -54,6 +60,8 @@ export default function EventDetails() {
     );
   }
 
+  const passed = isEventPassed(event);
+
   return (
     <div className="participant-page">
       <div className="participant-detail-hero panel-clip bg-zinc-900">
@@ -67,7 +75,9 @@ export default function EventDetails() {
         />
         <div className="participant-detail-hero__overlay" />
         <div className="participant-detail-hero__content">
-          <span className="organizer-badge organizer-badge--brand capitalize">{event.status}</span>
+          <span className={`organizer-badge ${passed ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'organizer-badge--brand'} capitalize`}>
+            {passed ? "Event Passed" : event.status}
+          </span>
           <h1 className="font-display text-3xl md:text-5xl text-white mt-3 leading-tight">{event.title}</h1>
           <p className="text-gray-300 mt-2 flex items-center gap-2 text-sm md:text-base">
             <HiLocationMarker className="text-brand shrink-0" /> {event.location}
@@ -128,7 +138,27 @@ export default function EventDetails() {
               </div>
             </div>
 
-            {event.status === "upcoming" && (
+
+            {passed ? (
+              <div style={{ paddingTop: "24px" }}>
+                <div className="rounded-2xl border border-rose-400/20 bg-gradient-to-br from-rose-500/10 via-rose-950/10 to-zinc-950/80 px-5 py-6 text-center shadow-lg shadow-rose-950/10 backdrop-blur-md">
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-rose-400/20 bg-rose-500/10">
+                      <HiLockClosed className="h-3.5 w-3.5 text-rose-400" />
+                    </span>
+
+                    <span className="font-display text-sm font-bold uppercase tracking-wider text-rose-300">
+                      Registration Closed
+                    </span>
+                  </div>
+
+                  <p className="mt-2 text-xs leading-relaxed text-gray-400">
+                    This event date has already passed.
+                  </p>
+                </div>
+              </div>
+            ) : event.status === "upcoming" ? (
+
               <div className="mt-8">
                 <Button
                   onClick={handleRegister}
@@ -140,7 +170,15 @@ export default function EventDetails() {
                   Register Now
                 </Button>
               </div>
+            ) : (
+              // Keep your existing status section here
+              <div className="mt-8 rounded-2xl border border-white/10 bg-zinc-800 p-4 text-center">
+                <span className="block font-display text-sm font-semibold uppercase tracking-wider text-gray-300">
+                  Status: {event.status}
+                </span>
+              </div>
             )}
+
           </div>
         </div>
       </div>

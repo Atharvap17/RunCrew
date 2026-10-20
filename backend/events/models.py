@@ -56,4 +56,9 @@ class Event(models.Model):
     def registered_count(self):
         return self.registration_set.count()
 
+    @property
+    def is_past(self):
+        from django.utils import timezone
+        return self.date < timezone.localdate()
+
 

@@ -20,6 +20,14 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     const { data } = await api.post("/users/login/", { email, password });
+
+    const role = data.user?.role;
+    if (role !== "participant") {
+      throw new Error(
+        "This account is not allowed to access the participant platform."
+      );
+    }
+
     localStorage.setItem("accessToken", data.access);
     localStorage.setItem("refreshToken", data.refresh);
     localStorage.setItem("user", JSON.stringify(data.user));
@@ -51,7 +59,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, login, register, logout, updateUser, isAdmin, isOrganizer}}
+      value={{ user, loading, login, register, logout, updateUser, isAdmin, isOrganizer }}
     >
       {children}
     </AuthContext.Provider>

@@ -5,6 +5,8 @@ import Button from "../../components/Common/Button";
 import ReadMore from "../../components/Common/ReadMore";
 import ScrollReveal from "../../components/Common/ScrollReveal";
 
+import { isEventPassed } from "../../utils/dateUtils";
+
 function formatEventDate(dateStr) {
   const d = new Date(dateStr);
   return {
@@ -73,6 +75,7 @@ export default function Events() {
           <div className="participant-event-grid">
             {events.map((event, index) => {
               const date = formatEventDate(event.date);
+              const passed = isEventPassed(event);
               const defaultImg = "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=900";
               return (
                 <ScrollReveal key={event.id} animation="bubble" delay={(index % 3) * 120}>
@@ -92,14 +95,19 @@ export default function Events() {
                         <div className="day">{date.day}</div>
                         <div className="month">{date.month}, {date.year}</div>
                       </div>
-                      {event.is_featured && (
-                        <div className="absolute top-4 right-4 z-10">
+                      <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-1.5">
+                        {event.is_featured && (
                           <span className="featured-badge">
                             <span className="featured-badge__dot" />
                             Featured
                           </span>
-                        </div>
-                      )}
+                        )}
+                        {passed && (
+                          <span className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider bg-rose-500/80 text-white rounded-md backdrop-blur-sm border border-rose-400/30">
+                            Passed
+                          </span>
+                        )}
+                      </div>
                       <div className="absolute bottom-4 right-4 bg-black/75 backdrop-blur-md px-3 py-1.5 text-white font-display text-xl rounded-md border border-white/10 shadow-lg z-10">
                         ₹{event.fees}
                       </div>
@@ -121,9 +129,15 @@ export default function Events() {
                       </div>
                       <div className="participant-event-card-footer">
                         <ReadMore to={`/events/${event.id}`} />
-                        <Button to={`/events/${event.id}`} variant="primary" size="sm" showArrow={false}>
-                          Book Now
-                        </Button>
+                        {passed ? (
+                          <Button to={`/events/${event.id}`} variant="secondary" size="sm" showArrow={false} className="opacity-80">
+                            View Event
+                          </Button>
+                        ) : (
+                          <Button to={`/events/${event.id}`} variant="primary" size="sm" showArrow={false}>
+                            Book Now
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </article>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaRunning } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
+import { HiExclamationCircle } from "react-icons/hi";
 import Input from "../../components/Common/Input";
 import Button from "../../components/Common/Button";
 
@@ -19,16 +20,8 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      const data = await login(form.email, form.password);
-      const role = data.user.role;
-
-      if (role === "admin") {
-        navigate("/admin");
-      } else if (role === "organizer") {
-        navigate("/organizer");
-      } else {
-        navigate("/");
-      }
+      await login(form.email, form.password);
+      navigate("/", { replace: true });
     } catch (err) {
       setError(err.response?.data?.detail || "Invalid email or password");
     } finally {
@@ -84,9 +77,15 @@ export default function Login() {
             )}
 
             {error && (
-              <div className="rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-sm px-4 py-3.5 flex items-center gap-3">
-                <span className="w-2 h-2 rounded-full bg-rose-400 shrink-0" />
-                {error}
+
+              <div className="flex items-start gap-3 rounded-xl border border-rose-400/20 bg-gradient-to-r from-rose-500/10 via-rose-500/5 to-transparent px-4 py-3.5 text-rose-200 shadow-lg shadow-rose-950/10 backdrop-blur-sm">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-rose-400/30 bg-rose-500/15">
+                  <HiExclamationCircle className="h-4 w-4 text-rose-400" />
+                </span>
+
+                <p className="pt-0.5 text-sm leading-relaxed">
+                  {error}
+                </p>
               </div>
             )}
 

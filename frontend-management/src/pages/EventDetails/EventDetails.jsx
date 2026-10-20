@@ -6,6 +6,7 @@ import RouteMap from "../../components/Map/RouteMap";
 import { useAuth } from "../../context/AuthContext";
 import Button from "../../components/Common/Button";
 import Card from "../../components/Common/Card";
+import { isEventPassed } from "../../utils/dateUtils";
 
 export default function EventDetails() {
   const { id } = useParams();
@@ -30,6 +31,10 @@ export default function EventDetails() {
   }
 
   const handleRegister = () => {
+    if (isEventPassed(event)) {
+      alert("Registration closed: This event date has already passed.");
+      return;
+    }
     if (!user) {
       navigate("/login", { state: { from: { pathname: `/events/${id}/register` } } });
       return;
@@ -54,6 +59,8 @@ export default function EventDetails() {
     );
   }
 
+  const passed = isEventPassed(event);
+
   return (
     <div className="participant-page">
       <div className="participant-detail-hero panel-clip bg-zinc-900">
@@ -67,7 +74,9 @@ export default function EventDetails() {
         />
         <div className="participant-detail-hero__overlay" />
         <div className="participant-detail-hero__content">
-          <span className="organizer-badge organizer-badge--brand capitalize">{event.status}</span>
+          <span className={`organizer-badge ${passed ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'organizer-badge--brand'} capitalize`}>
+            {passed ? "Event Passed" : event.status}
+          </span>
           <h1 className="font-display text-3xl md:text-5xl text-white mt-3 leading-tight">{event.title}</h1>
           <p className="text-gray-300 mt-2 flex items-center gap-2 text-sm md:text-base">
             <HiLocationMarker className="text-brand shrink-0" /> {event.location}
@@ -128,7 +137,16 @@ export default function EventDetails() {
               </div>
             </div>
 
-            {event.status === "upcoming" && (
+            {passed ? (
+              <div className="mt-8 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-center">
+                <span className="text-rose-400 font-display font-semibold text-sm uppercase tracking-wider block">
+                  Registration Closed
+                </span>
+                <span className="text-gray-400 text-xs mt-1 block">
+                  This event date has already passed.
+                </span>
+              </div>
+            ) : event.status === "upcoming" ? (
               <div className="mt-8">
                 <Button
                   onClick={handleRegister}
@@ -139,6 +157,12 @@ export default function EventDetails() {
                 >
                   Register Now
                 </Button>
+              </div>
+            ) : (
+              <div className="mt-8 p-4 rounded-2xl bg-zinc-800 border border-white/10 text-center">
+                <span className="text-gray-300 font-display font-semibold text-sm uppercase tracking-wider block">
+                  Status: {event.status}
+                </span>
               </div>
             )}
           </div>
